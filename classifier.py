@@ -177,10 +177,11 @@ class Classifier:
             basics += ("\nLOCATION RULE (strict): the student can only take jobs located in " + PREFERRED_CITIES
                        + ", or fully remote/work-from-home jobs open to India. Mark relevant=false if the job is only in "
                        "other cities (e.g. Pune, Mumbai, Delhi NCR, Gurgaon, Noida, Kolkata, Ahmedabad, or abroad). "
-                       "The student cannot travel for interviews: mark relevant=false if the interview, test or walk-in "
-                       "must be attended in person in another city. Virtual interviews, on-campus drives and interviews "
-                       "in the cities above are fine. If location or interview mode is not stated, keep it relevant and "
-                       "say 'location not stated' in the reason.")
+                       "INTERVIEW RULE: the student can attend in-person interviews, tests or walk-ins ONLY in Bengaluru. "
+                       "Mark relevant=false if any round must be attended in person in a city other than Bengaluru "
+                       "(even Chennai or Hyderabad). Virtual/online rounds, on-campus drives and in-person rounds in "
+                       "Bengaluru are fine. If location or interview mode is not stated, keep it relevant and say "
+                       "'interview mode not stated' in the reason.")
         if EXCLUDE_ROLES:
             basics += ("\nThe student does NOT want these roles - mark relevant=false when the job is mainly one of "
                        "them (a post listing several roles is still relevant if another listed role fits): "
