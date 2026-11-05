@@ -24,8 +24,12 @@ GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "").replace(" ", "")
 GMAIL_ADDRESS2 = os.getenv("GMAIL_ADDRESS2", "")
 GMAIL_APP_PASSWORD2 = os.getenv("GMAIL_APP_PASSWORD2", "").replace(" ", "")
 # (address, password, pseudo chat id under which its emails are remembered as processed)
+# Third inbox (e.g. your main Gmail) - read for job alerts and application follow-ups too
+GMAIL_ADDRESS3 = os.getenv("GMAIL_ADDRESS3", "")
+GMAIL_APP_PASSWORD3 = os.getenv("GMAIL_APP_PASSWORD3", "").replace(" ", "")
 ACCOUNTS = [(a, pw, -1 - i) for i, (a, pw) in enumerate([(GMAIL_ADDRESS, GMAIL_APP_PASSWORD),
-                                                         (GMAIL_ADDRESS2, GMAIL_APP_PASSWORD2)]) if a and pw]
+                                                         (GMAIL_ADDRESS2, GMAIL_APP_PASSWORD2),
+                                                         (GMAIL_ADDRESS3, GMAIL_APP_PASSWORD3)]) if a and pw]
 MAIL_DAYS = int(os.getenv("MAIL_DAYS", "2"))  # how far back to look for unread-by-bot alerts
 
 SENDERS = ["linkedin.com", "naukri.com", "indeed.com", "internshala.com", "foundit.in", "glassdoor",
@@ -180,11 +184,8 @@ def fetch_alerts(address, password, is_done):
 
 
 # ---------- follow-ups on jobs you applied to ----------
-# Optional extra inbox you apply with (e.g. your main Gmail); the alert inboxes are checked too.
-GMAIL_ADDRESS3 = os.getenv("GMAIL_ADDRESS3", "")
-GMAIL_APP_PASSWORD3 = os.getenv("GMAIL_APP_PASSWORD3", "").replace(" ", "")
-UPDATE_ACCOUNTS = [(a, pw, -10 - i) for i, (a, pw) in enumerate(
-    [(a, pw) for a, pw, _ in ACCOUNTS] + [(GMAIL_ADDRESS3, GMAIL_APP_PASSWORD3)]) if a and pw]
+# Follow-ups are read from the same inboxes (ids -10, -11, -12 keep their place)
+UPDATE_ACCOUNTS = [(a, pw, -10 - i) for i, (a, pw, _) in enumerate(ACCOUNTS)]
 UPDATE_SENDERS = ["greenhouse.io", "greenhouse-mail.io", "lever.co", "myworkday.com", "workday.com",
                   "smartrecruiters.com", "ashbyhq.com", "icims.com", "successfactors", "taleo.net", "oraclecloud.com",
                   "hackerrank.com", "hackerearth.com", "mettl.com", "mercer", "codility.com", "imocha", "superset",
