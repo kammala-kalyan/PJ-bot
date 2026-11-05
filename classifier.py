@@ -9,6 +9,7 @@ Without a key or if the AI fails, a keyword match against your resume decides.
 """
 import asyncio
 import json
+import os
 import logging
 import re
 import time
@@ -85,6 +86,16 @@ def looks_like_job(text):
     return signals >= 1
 
 
+# Roles you never want (EXCLUDE_ROLES in .env, comma-separated)
+EXCLUDE_ROLES = [r.strip() for r in os.getenv("EXCLUDE_ROLES", "").split(",") if r.strip()]
+# "Full Stack Developer" -> matches "full stack", "full-stack", "fullstack" in any wording
+_cores = [re.sub(r"\s*(developer|engineer|development|intern)s?$", "", r, flags=re.I) for r in EXCLUDE_ROLES]
+EXCLUDE_RE = re.compile("|".join(re.escape(c).replace(r"\ ", r"[\s-]?") for c in _cores if c), re.I) \
+    if EXCLUDE_ROLES else None
+# skills that only point to the excluded roles, so they don't count as a match on their own
+EXCLUDED_SKILLS = {"full stack", "backend", "frontend", "web development", "node", "react", "javascript"} \
+    if EXCLUDE_ROLES else set()
+
 # Words too generic to prove a match on their own ("Excel", "statistics" appear in sales/ops posts too)
 WEAK_SKILLS = {"excel", "statistics", "analytics", "testing", "cloud", "networking", "linux", "backend",
                "frontend", "business analyst"}
@@ -96,7 +107,9 @@ def keyword_match(text, skills):
     """Fallback when the AI is unavailable: needs a specific resume skill, and not a sales/ops role."""
     t = text.lower()
     found = sorted(s for s in skills if re.search(rf"(?<![a-z]){re.escape(s)}(?![a-z])", t))
-    strong = [s for s in found if s not in WEAK_SKILLS]
+    strong = [s for s in found if s not in WEAK_SKILLS | EXCLUDED_SKILLS]
+    if EXCLUDE_RE and EXCLUDE_RE.search(t[:250]):
+        return empty(False)  # the job title (top of the post) is a role you excluded
     if strong and not NON_TECH_ROLE.search(t):
         return empty(True, "Matches your resume: " + ", ".join(list(dict.fromkeys(strong + found))[:5]))
     return empty(False)
@@ -144,7 +157,12 @@ class Classifier:
         return info
 
     def fill(self, template, text, limit=6000):
-        return (template.replace("__PROFILE__", self.profile or "(not given)")
+        basics = self.profile or "(not given)"
+        if EXCLUDE_ROLES:
+            basics += ("\nThe student does NOT want these roles - mark relevant=false when the job is mainly one of "
+                       "them (a post listing several roles is still relevant if another listed role fits): "
+                       + ", ".join(EXCLUDE_ROLES))
+        return (template.replace("__PROFILE__", basics)
                 .replace("__RESUME__", self.resumes.text[:12000] or "(no resume uploaded yet)")
                 .replace("__TEXT__", text[:limit]))
 
