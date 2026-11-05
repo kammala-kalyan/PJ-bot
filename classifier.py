@@ -86,6 +86,11 @@ def looks_like_job(text):
     return signals >= 1
 
 
+# Where you can work / interview (PREFERRED_CITIES in .env)
+PREFERRED_CITIES = os.getenv("PREFERRED_CITIES_TEXT",
+                             "Bengaluru or other South Indian cities (Mysuru, Mangaluru, Chennai, Coimbatore, "
+                             "Hyderabad, Kochi, Thiruvananthapuram, Visakhapatnam, Vijayawada, Tirupati)")
+
 # Roles you never want (EXCLUDE_ROLES in .env, comma-separated)
 EXCLUDE_ROLES = [r.strip() for r in os.getenv("EXCLUDE_ROLES", "").split(",") if r.strip()]
 # "Full Stack Developer" -> matches "full stack", "full-stack", "fullstack" in any wording
@@ -168,6 +173,14 @@ class Classifier:
 
     def fill(self, template, text, limit=6000):
         basics = self.profile or "(not given)"
+        if PREFERRED_CITIES:
+            basics += ("\nLOCATION RULE (strict): the student can only take jobs located in " + PREFERRED_CITIES
+                       + ", or fully remote/work-from-home jobs open to India. Mark relevant=false if the job is only in "
+                       "other cities (e.g. Pune, Mumbai, Delhi NCR, Gurgaon, Noida, Kolkata, Ahmedabad, or abroad). "
+                       "The student cannot travel for interviews: mark relevant=false if the interview, test or walk-in "
+                       "must be attended in person in another city. Virtual interviews, on-campus drives and interviews "
+                       "in the cities above are fine. If location or interview mode is not stated, keep it relevant and "
+                       "say 'location not stated' in the reason.")
         if EXCLUDE_ROLES:
             basics += ("\nThe student does NOT want these roles - mark relevant=false when the job is mainly one of "
                        "them (a post listing several roles is still relevant if another listed role fits): "

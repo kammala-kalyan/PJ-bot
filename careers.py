@@ -17,9 +17,16 @@ import httpx
 
 log = logging.getLogger("careers")
 
-INDIA = re.compile(r"bengaluru|bangalore|india|karnataka|hyderabad|pune|chennai|mumbai|gurgaon|gurugram|noida|"
-                   r"delhi|kolkata|ahmedabad|kochi|coimbatore|mysore|mysuru|jaipur|indore|chandigarh", re.I)
-REMOTE_FOR_US = re.compile(r"apac|asia|global|worldwide|anywhere", re.I)
+import os  # noqa: E402
+
+# Cities you accept (PREFERRED_CITIES in .env). A job listed in several cities passes if one of them is here.
+CITIES = [c.strip() for c in os.getenv(
+    "PREFERRED_CITIES",
+    "Bengaluru, Bangalore, Karnataka, Mysuru, Mysore, Mangaluru, Mangalore, Hubli, Chennai, Coimbatore, Madurai, "
+    "Tamil Nadu, Hyderabad, Telangana, Kochi, Cochin, Thiruvananthapuram, Trivandrum, Kerala, Visakhapatnam, "
+    "Vizag, Vijayawada, Tirupati, Andhra Pradesh").split(",") if c.strip()]
+INDIA = re.compile("|".join(re.escape(c) for c in CITIES), re.I)
+REMOTE_FOR_US = re.compile(r"apac|asia|global|worldwide|anywhere|india", re.I)  # "Remote - India" is fine
 
 
 class _Loc:
