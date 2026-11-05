@@ -77,6 +77,21 @@ def best_link(text):
     return next((u for u in urls if APPLY_HINT.search(u)), urls[0] if urls else None)
 
 
+# "2+ years of experience", "1-3 yrs of relevant experience", "Experience: 2 years" (0-1 years is fine)
+YEARS = r"(?<![\w\-–.])(\d{1,2})\s*\+?\s*(?:(?:-|–|to)\s*\d{1,2}\s*\+?\s*)?(?:years?|yrs?)\b"
+EXPERIENCE = re.compile(YEARS + r"[^.\n]{0,40}?\bexperience|\bexperience\s*(?:of|:|-|–)?\s*(?:at least|minimum(?: of)?)?\s*"
+                        + YEARS, re.I)
+
+
+def needs_experience(text):
+    """-> e.g. '2+ years of experience' if the post asks for 1+ years of work experience, else None."""
+    for m in EXPERIENCE.finditer(text):
+        years = m.group(1) or m.group(2)
+        if 1 <= int(years) <= 15:
+            return m.group(0).strip()
+    return None
+
+
 def empty(relevant=False, reason=None):
     return {"relevant": relevant, "reason": reason, "company": None, "role": None, "location": None,
             "pay": None, "deadline": None, "apply_link": None}
@@ -152,6 +167,8 @@ class Classifier:
         clean = text.strip()
         if len(clean) < 25 or not looks_like_job(clean):
             return empty(False)
+        if needs_experience(clean):
+            return empty(False, f"Needs {needs_experience(clean)}")
         self.resumes.refresh()
         info = None
         if self.api_key:
@@ -167,6 +184,8 @@ class Classifier:
 
     async def check_opening(self, text):
         """For text that is known to be a single job opening (career pages): resume check only."""
+        if needs_experience(text):  # hard rule, in case the AI overlooks it
+            return empty(False, f"Needs {needs_experience(text)}")
         self.resumes.refresh()
         if self.api_key:
             try:
