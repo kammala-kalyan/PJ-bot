@@ -48,6 +48,7 @@ jobs:
           SKILLS_PROFILE: ${{ secrets.SKILLS_PROFILE }}
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          TOPIC_CAMPUS: ${{ secrets.TOPIC_CAMPUS }}
           DB_PATH: data/state_v2.db
           LABELS_PATH: data/none.jsonl
           LOOP_MINUTES: "9"      # stay awake ~9 min per run ...

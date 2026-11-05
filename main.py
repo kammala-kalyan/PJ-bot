@@ -206,6 +206,9 @@ class Sorter:
         self.labels = load_labels(LABELS_PATH)
 
     async def thread_for(self, key):
+        fixed = os.getenv(f"TOPIC_{key.upper()}")  # e.g. TOPIC_CAMPUS=208: always use this existing tab
+        if fixed:
+            return int(fixed)
         thread_id = self.state.topic(key)
         if thread_id:
             return thread_id
@@ -350,6 +353,7 @@ class Sorter:
             raise SystemExit("Add your placement group id(s) to SOURCE_CHATS in .env")
         for kind in {k for _, k in self.chats.values()}:
             await self.thread_for(kind)
+        log.info("Tabs in use: %s", {k: self.state.topic(k) for k in TOPICS})
 
     async def run(self):
         """Always-on mode (laptop / server): history first, then live messages."""
