@@ -50,7 +50,9 @@ __RESUME__
 Below is a job-alert EMAIL from a job site. Links are marked like [L3].
 List EVERY job/internship posting in it (ignore ads, courses, "people viewed your profile", news).
 For each job decide "relevant": true only if the student is capable of the job's main requirements (by skills,
-projects, tools - not by title) and is eligible as a 2027 fresher/intern (skip roles needing 2+ years experience).
+projects, tools - not by title) and is eligible as a B.Tech CSE (Data Science) 2027 fresher/intern: false if the job
+needs 1+ years of full-time experience, a different degree (Accounting, Finance, Commerce, MBA, Law, Mechanical/
+Civil/Electrical-only), or a qualification the student lacks (CA, CMA, CFA, CPA, ACCA...).
 
 Return only JSON: {"jobs": [{"title": str, "company": str|null, "location": str|null, "pay": str|null,
 "link": "L<number>"|null, "relevant": bool, "reason": "short line naming matching resume skills"}]}

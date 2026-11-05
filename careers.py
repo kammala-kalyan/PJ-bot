@@ -51,12 +51,20 @@ TITLE_OK = re.compile(r"data|machine learning|\bml\b|\bai\b|artificial intellige
                       r"quality|test|sdet|software engineer|software developer|sde|python|nlp|llm|genai|gen ai|"
                       r"generative|vision|research|business intelligence|\bbi\b|power bi|automation|support engineer|"
                       r"cloud|devops|platform engineer|solutions engineer|consultant", re.I)
+# roles outside your field, skipped before any AI check
+TITLE_OTHER_FIELD = re.compile(r"financ|accountant|accounting|account payable|accounts receivable|fp&a|tax|audit|"
+                               r"treasury|payroll|legal|counsel|paralegal|compliance officer|\bhr\b|human resource|"
+                               r"recruit|talent acquisition|sales|account executive|business development|marketing|"
+                               r"customer success|procurement|supply chain|logistics|warehouse|mechanical|civil|"
+                               r"electrical|hardware|asic|vlsi|rtl|silicon|analog|firmware|embedded|manufacturing|"
+                               r"nurse|clinical|pharma|medical|physician|teacher|content writer|copywriter|designer",
+                               re.I)
 TITLE_SENIOR = re.compile(r"senior|\bsr\.?\b|staff|principal|lead\b|manager|director|head of|\bhead\b|architect|"
                           r"\bvp\b|vice president|\b(ii|iii|iv|2|3)\b|expert|specialist ii|chief|distinguished", re.I)
 HEADERS = {"User-Agent": "Mozilla/5.0 (job-alert bot; checks public job feeds)"}
 
 
-def clean(text, limit=3500):
+def clean(text, limit=12000):
     text = re.sub(r"<[^>]+>", " ", html.unescape(text or ""))
     return re.sub(r"\s+", " ", text).strip()[:limit]
 
@@ -168,7 +176,7 @@ def candidate(job):
     """Cheap filter before any AI: right place, fresher-level, title in your areas."""
     title = job.get("title") or ""
     return (LOCATION_OK.search(job.get("location") or "") and TITLE_OK.search(title)
-            and not TITLE_SENIOR.search(title))
+            and not TITLE_SENIOR.search(title) and not TITLE_OTHER_FIELD.search(title))
 
 
 async def fetch_all(companies, concurrency=16):

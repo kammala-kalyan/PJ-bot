@@ -40,7 +40,11 @@ Decide:
     certifications in the resume(s). Judge by what the job actually needs, NOT by its title: any role whose
     requirements the student can meet counts, even if the title is new or unusual. Generic fresher roles open to
     the student's branch (e.g. software/trainee/associate engineer) count if the resume shows the needed basics.
-  * Eligible = branch and graduation year allowed, or not stated.
+  * Eligible = ALL stated requirements are met by a B.Tech CSE (Data Science) student graduating in 2027 with no
+    full-time work experience. NOT eligible if the job requires: a different degree (e.g. Accounting, Finance,
+    Commerce, MBA, Law, Medicine, Mechanical/Civil/Electrical-only), a professional qualification the student lacks
+    (CA, CMA, CFA, CPA, ACCA, etc.), 1+ years of full-time experience (internships for students are fine), or other
+    branches only. Read the requirements / qualifications section carefully - one unmet hard requirement = false.
   * False if the job mainly needs skills the resume doesn't show (e.g. mechanical design, VLSI, sales quotas).
 - reason: one short line naming the resume skills/projects that match the job, or what's missing.
 
@@ -166,10 +170,13 @@ class Classifier:
         self.resumes.refresh()
         if self.api_key:
             try:
-                return await self._ai(text)
+                return await self._ai(text, limit=14000)  # full description incl. requirements
             except Exception as e:
                 log.warning("AI check failed, using keyword match: %s", e)
-        return keyword_match(text, self.resumes.skills)
+        info = keyword_match(text, self.resumes.skills)
+        if info["relevant"] and re.search(r"\b([1-9]|1[0-9])\+?\s*(years|yrs)|\bCA\b|\bCMA\b|\bMBA\b", text):
+            return empty(False)  # without the AI, play safe on experience/qualification requirements
+        return info
 
     def fill(self, template, text, limit=6000):
         basics = self.profile or "(not given)"
@@ -190,8 +197,8 @@ class Classifier:
                 .replace("__RESUME__", self.resumes.text[:12000] or "(no resume uploaded yet)")
                 .replace("__TEXT__", text[:limit]))
 
-    async def _ai(self, text):
-        data = await self.ask_json(self.fill(PROMPT, text))
+    async def _ai(self, text, limit=6000):
+        data = await self.ask_json(self.fill(PROMPT, text, limit))
         return normalize(data[0] if isinstance(data, list) else data)
 
     async def ask_json(self, prompt):

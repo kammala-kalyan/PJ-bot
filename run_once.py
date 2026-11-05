@@ -199,7 +199,7 @@ async def check_careers(s):
         if not info.get("relevant"):
             continue
         info.update(company=company["name"], role=job["title"], location=job["location"], apply_link=job["url"])
-        post = career_post(info)
+        post = career_post(info, company)
         await s.post_to("offcampus", lambda t, p=post: s.bot.send_text(t, p))
         posted += 1
         log.info("🏢 ✅ %s · %s", job["title"], company["name"])
@@ -207,7 +207,7 @@ async def check_careers(s):
         log.info("Career pages: %s new fresher-level opening(s), posted %s matching", len(new), posted)
 
 
-def career_post(info):
+def career_post(info, company):
     lines = [f"<b>{esc(info['role'])}</b> · {esc(info['company'])}"]
     meta = [f"{icon} {esc(info[k])}" for icon, k in (("📍", "location"), ("💰", "pay"), ("⏳", "deadline"))
             if info.get(k)]
@@ -216,7 +216,10 @@ def career_post(info):
     lines.append(f'🔗 <a href="{esc(info["apply_link"], quote=True)}">Apply on company site</a>')
     if info.get("reason"):
         lines.append(f"✅ <i>{esc(info['reason'])}</i>")
-    lines.append("\n<i>🏢 New on the company's careers page - apply early</i>")
+    platform = {"greenhouse": "Greenhouse", "lever": "Lever", "ashby": "Ashby", "smartrecruiters": "SmartRecruiters",
+                "workday": "Workday"}.get(company["ats"], company["ats"])
+    lines.append(f"\n<b>Source:</b> {esc(company['name'])} official careers page (via {platform})")
+    lines.append("<i>🏢 Found minutes after the company posted it - apply early</i>")
     return "\n".join(lines)
 
 
