@@ -60,6 +60,8 @@ DB_PATH = os.getenv("DB_PATH", "data/state_v2.db")
 LABELS_PATH = os.getenv("LABELS_PATH", "data/labels.jsonl")  # pre-checked history labels (optional)
 ATTACH_WINDOW = timedelta(minutes=15)  # a file/photo with no text belongs to the message just before it
 TOPICS = {"campus": "🎯 Campus Jobs For Me", "offcampus": "🌐 Off-Campus Jobs For Me"}
+# Separate channels instead of topic tabs (CAMPUS_CHANNEL_ID / OFFCAMPUS_CHANNEL_ID in .env)
+CHANNELS = {k: int(os.environ[f"{k.upper()}_CHANNEL_ID"]) for k in TOPICS if os.getenv(f"{k.upper()}_CHANNEL_ID")}
 IST = timezone(timedelta(hours=5, minutes=30))
 esc = html.escape
 
@@ -150,16 +152,22 @@ class Bot:
             raise BotError(f"{method}: {j.get('description')}")
         raise BotError(f"{method}: still rate-limited after retries")
 
-    async def send_text(self, thread_id, text):
+    @staticmethod
+    def where(dest):
+        """dest = a topic id in the target group, or ("channel", chat_id) for a separate channel."""
+        if isinstance(dest, tuple):
+            return {"chat_id": dest[1]}
+        return {"chat_id": TARGET_GROUP_ID, "message_thread_id": dest}
+
+    async def send_text(self, dest, text):
         return await self.call("sendMessage", {
-            "chat_id": TARGET_GROUP_ID, "message_thread_id": thread_id, "text": text,
+            **self.where(dest), "text": text,
             "parse_mode": "HTML", "link_preview_options": json.dumps({"is_disabled": True}),
         })
 
-    async def send_file(self, thread_id, data, filename, is_photo):
+    async def send_file(self, dest, data, filename, is_photo):
         field, method = ("photo", "sendPhoto") if is_photo else ("document", "sendDocument")
-        return await self.call(method, {"chat_id": TARGET_GROUP_ID, "message_thread_id": thread_id},
-                               files={field: (filename, data)})
+        return await self.call(method, self.where(dest), files={field: (filename, data)})
 
 
 def media_info(msg):
@@ -214,6 +222,9 @@ class Sorter:
         self.labels = load_labels(LABELS_PATH)
 
     async def thread_for(self, key):
+        channel = CHANNELS.get(key)  # a separate channel for this kind of job, if set
+        if channel:
+            return ("channel", channel)
         fixed = os.getenv(f"TOPIC_{key.upper()}")  # e.g. TOPIC_CAMPUS=208: always use this existing tab
         if fixed:
             return int(fixed)
@@ -343,10 +354,14 @@ class Sorter:
         self.resumes.refresh()
 
         me = await self.bot.call("getMe")
-        target = await self.bot.call("getChat", {"chat_id": TARGET_GROUP_ID})
-        if not target.get("is_forum"):
-            raise SystemExit("Turn on Topics in your target group (Group settings → Topics), then restart.")
-        log.info("Bot @%s will post into '%s'", me["username"], target.get("title"))
+        for key, chat_id in CHANNELS.items():
+            ch = await self.bot.call("getChat", {"chat_id": chat_id})  # fails clearly if the bot isn't admin there
+            log.info("Bot @%s posts %s jobs into channel '%s'", me["username"], key, ch.get("title"))
+        if len(CHANNELS) < len(TOPICS):
+            target = await self.bot.call("getChat", {"chat_id": TARGET_GROUP_ID})
+            if not target.get("is_forum"):
+                raise SystemExit("Turn on Topics in your target group (Group settings → Topics), then restart.")
+            log.info("Bot @%s will post into '%s'", me["username"], target.get("title"))
 
         await self.client.get_dialogs()  # loads your chats so ids can be resolved
         for kind, sources in SOURCES.items():

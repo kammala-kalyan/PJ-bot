@@ -53,6 +53,8 @@ jobs:
           GMAIL_APP_PASSWORD2: ${{ secrets.GMAIL_APP_PASSWORD2 }}
           TOPIC_CAMPUS: ${{ secrets.TOPIC_CAMPUS }}
           EXCLUDE_ROLES: ${{ secrets.EXCLUDE_ROLES }}
+          CAMPUS_CHANNEL_ID: ${{ secrets.CAMPUS_CHANNEL_ID }}
+          OFFCAMPUS_CHANNEL_ID: ${{ secrets.OFFCAMPUS_CHANNEL_ID }}
           DB_PATH: data/state_v2.db
           LABELS_PATH: data/none.jsonl
           LOOP_MINUTES: "9"      # stay awake ~9 min per run ...

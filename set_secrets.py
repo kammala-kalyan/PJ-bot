@@ -11,7 +11,8 @@ from dotenv import dotenv_values
 
 NAMES = ["API_ID", "API_HASH", "SESSION_STRING", "BOT_TOKEN", "TARGET_GROUP_ID", "SOURCE_CHATS",
          "GEMINI_API_KEY", "GEMINI_MODEL", "PROFILE", "GMAIL_ADDRESS", "GMAIL_APP_PASSWORD",
-         "GMAIL_ADDRESS2", "GMAIL_APP_PASSWORD2", "TOPIC_CAMPUS", "EXCLUDE_ROLES"]
+         "GMAIL_ADDRESS2", "GMAIL_APP_PASSWORD2", "TOPIC_CAMPUS", "EXCLUDE_ROLES",
+         "CAMPUS_CHANNEL_ID", "OFFCAMPUS_CHANNEL_ID"]
 
 env = dotenv_values(".env")
 values = {n: (env.get(n) or "").strip() for n in NAMES}
