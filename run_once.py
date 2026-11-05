@@ -46,7 +46,7 @@ async def check_campus(s):
             log.info("%s: checked %s new message(s)", getattr(entity, "title", chat_id), len(msgs))
 
 
-def email_post(job, site, subject, link):
+def email_post(job, site, sender, subject, link, src):
     title = f"<b>{esc(job.get('title') or 'Job opening')}</b>"
     if job.get("company"):
         title += f" · {esc(job['company'])}"
@@ -58,7 +58,8 @@ def email_post(job, site, subject, link):
         lines.append(f'🔗 <a href="{esc(link, quote=True)}">Apply / view job</a>')
     if job.get("reason"):
         lines.append(f"✅ <i>{esc(job['reason'])}</i>")
-    lines.append(f"\n<i>📧 {esc(site)} alert · {esc(subject[:80])}</i>")
+    lines.append(f"\n<b>Source:</b> {esc(site)} job alert")
+    lines.append(mailjobs.source_line(src, sender, subject))
     return "\n".join(lines)
 
 
@@ -73,6 +74,12 @@ async def check_email(s):
 async def check_inbox(s, address, password, box_id):
     alerts = await asyncio.to_thread(mailjobs.fetch_alerts, address, password,
                                      lambda uid: s.state.done(box_id, uid))
+    if not s.state.done(box_id, 0):  # newly connected inbox: older emails are history, start from now
+        for a in alerts:
+            s.state.mark(box_id, a[0], False)
+        s.state.mark(box_id, 0, False)
+        log.info("Started reading job alerts from a new inbox (from now on)")
+        return
     posted = 0
     for uid, sender, subject, date, text, links in alerts:
         if text is None or len(text) < 80:  # not a job alert
@@ -96,7 +103,7 @@ async def check_inbox(s, address, password, box_id):
             m = str(job.get("link") or "")
             if m.upper().startswith("L") and m[1:].isdigit() and 0 < int(m[1:]) <= len(links):
                 link = links[int(m[1:]) - 1]
-            post = email_post(job, site, subject, link)
+            post = email_post(job, site, sender, subject, link, date)
             await s.post_to("offcampus", lambda t, p=post: s.bot.send_text(t, p))
             posted += 1
             log.info("📧 ✅ %s · %s (%s)", job.get("title"), job.get("company"), site)
@@ -117,6 +124,12 @@ async def check_updates(s):
                                             lambda uid, b=box_id: s.state.done(b, uid))
         except Exception:
             log.exception("Update check failed for one inbox; will retry next round")
+            continue
+        if not s.state.done(box_id, 0):  # newly connected inbox: start from now
+            for m in mails:
+                s.state.mark(box_id, m[0], False)
+            s.state.mark(box_id, 0, False)
+            log.info("Started reading application updates from a new inbox (from now on)")
             continue
         for uid, sender, subject, date, text, links in mails:
             if text is None:
@@ -148,7 +161,7 @@ async def check_updates(s):
                     lines.append(f"⏳ <b>By:</b> {esc(d['deadline'])}")
                 if link:
                     lines.append(f'🔗 <a href="{esc(link, quote=True)}">Open</a>')
-                lines.append(f"\n<i>📧 {esc(sender[:60])} · {esc(subject[:80])}</i>")
+                lines.append("\n" + mailjobs.source_line(date, sender, subject))
                 post = "\n".join(lines)
                 await s.post_to("updates", lambda t, p=post: s.bot.send_text(t, p))
                 log.info("📬 %s · %s · %s", status, d.get("company"), d.get("role"))

@@ -14,6 +14,7 @@ import os
 import re
 from email.header import decode_header, make_header
 from html.parser import HTMLParser
+from urllib.parse import quote
 
 log = logging.getLogger("mail")
 
@@ -113,6 +114,33 @@ def email_text(msg):
     return text, links
 
 
+def meta(msg, address):
+    """Where an email came from: inbox, time received, and a link that opens it in Gmail."""
+    from email.utils import parsedate_to_datetime
+    from datetime import timedelta, timezone
+    msgid = (msg.get("Message-ID") or "").strip().strip("<>")
+    try:
+        when = parsedate_to_datetime(msg.get("Date")).astimezone(timezone(timedelta(hours=5, minutes=30)))
+        when = when.strftime("%d %b, %I:%M %p")
+    except Exception:
+        when = ""
+    link = (f"https://mail.google.com/mail/u/?authuser={quote(address)}#search/rfc822msgid%3A{quote(msgid, safe='')}"
+            if msgid else None)
+    return {"inbox": address, "when": when, "link": link}
+
+
+def source_line(m, sender, subject):
+    """HTML footer naming the source email, with a link that opens it."""
+    from html import escape as esc
+    parts = [f"📧 {esc(sender[:50])}", esc(subject[:70])]
+    if m.get("when"):
+        parts.append(f"received {esc(m['when'])}")
+    line = "<i>" + " · ".join(parts) + f"\nInbox: {esc(m['inbox'])}</i>"
+    if m.get("link"):
+        line += f'\n<a href="{esc(m["link"], quote=True)}">📨 Open original email</a>'
+    return line
+
+
 def _header(msg, name):
     try:
         return str(make_header(decode_header(msg.get(name, ""))))
@@ -139,10 +167,10 @@ def fetch_alerts(address, password, is_done):
             msg = email.message_from_bytes(msg_data[0][1])
             subject, sender = _header(msg, "Subject"), _header(msg, "From")
             if not JOB_SUBJECT.search(subject):
-                out.append((uid, sender, subject, msg.get("Date", ""), None, None))  # not a job alert: just mark done
+                out.append((uid, sender, subject, meta(msg, address), None, None))  # not a job alert: just mark done
                 continue
             text, links = email_text(msg)
-            out.append((uid, sender, subject, msg.get("Date", ""), text, links))
+            out.append((uid, sender, subject, meta(msg, address), text, links))
         return out
     finally:
         try:
@@ -210,10 +238,10 @@ def fetch_updates(address, password, is_done):
             msg = email.message_from_bytes(msg_data[0][1])
             subject, sender = _header(msg, "Subject"), _header(msg, "From")
             if NOT_UPDATE.search(subject):
-                out.append((uid, sender, subject, msg.get("Date", ""), None, None))  # alert/marketing: mark done
+                out.append((uid, sender, subject, meta(msg, address), None, None))  # alert/marketing: mark done
                 continue
             text, links = email_text(msg)
-            out.append((uid, sender, subject, msg.get("Date", ""), text, links))
+            out.append((uid, sender, subject, meta(msg, address), text, links))
         return out
     finally:
         try:
