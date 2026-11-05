@@ -105,6 +105,18 @@ async def check_inbox(s, address, password, box_id):
             m = str(job.get("link") or "")
             if m.upper().startswith("L") and m[1:].isdigit() and 0 < int(m[1:]) <= len(links):
                 link = links[int(m[1:]) - 1]
+            full = await asyncio.to_thread(mailjobs.job_description, link)
+            if full:  # check experience etc. against the full job post, not just the alert's one-liner
+                if mailjobs.SENIOR_LEVEL.search(full):
+                    log.info("Skipped %s · %s: LinkedIn lists it as a senior role", job.get("title"), job.get("company"))
+                    continue
+                info = await s.classifier.check_opening(f"Company: {job.get('company')}\nJob title: {job.get('title')}\n"
+                                                        f"Location: {job.get('location')}\n\n{full}")
+                if not info.get("relevant"):
+                    log.info("Skipped %s · %s after reading the full post: %s", job.get("title"), job.get("company"),
+                             info.get("reason"))
+                    continue
+                job["reason"] = info.get("reason") or job.get("reason")
             post = email_post(job, site, sender, subject, link, date)
             public = email_post(job, site, sender, subject, link, date, private=False)
             await s.post_to("offcampus", lambda t, p=post: s.bot.send_text(t, p),

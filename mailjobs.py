@@ -8,6 +8,7 @@ Needs GMAIL_ADDRESS and GMAIL_APP_PASSWORD (Google Account -> Security ->
 2-Step Verification -> App passwords). Read-only: emails are never changed.
 """
 import email
+import html
 import imaplib
 import logging
 import os
@@ -15,6 +16,8 @@ import re
 from email.header import decode_header, make_header
 from html.parser import HTMLParser
 from urllib.parse import quote
+
+import httpx
 
 log = logging.getLogger("mail")
 
@@ -251,6 +254,31 @@ def fetch_updates(address, password, is_done):
             imap.logout()
         except Exception:
             pass
+
+
+# Alert emails only show title/company/location, so the full LinkedIn job page is read to check
+# experience and other requirements before posting.
+LINKEDIN_JOB = re.compile(r"linkedin\.com/(?:comm/)?jobs/view/(\d+)")
+SENIOR_LEVEL = re.compile(r"Seniority level\s+(Mid-Senior level|Director|Executive)", re.I)
+
+
+def job_description(link):
+    """Full text of a LinkedIn job post, or None (other sites, or the page couldn't be read)."""
+    m = LINKEDIN_JOB.search(link or "")
+    if not m:
+        return None
+    try:
+        r = httpx.get(f"https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/{m.group(1)}",
+                      headers={"User-Agent": "Mozilla/5.0"}, timeout=30, follow_redirects=True)
+    except Exception as e:
+        log.info("Couldn't read LinkedIn job %s: %s", m.group(1), e)
+        return None
+    if r.status_code != 200:
+        log.info("Couldn't read LinkedIn job %s: HTTP %s", m.group(1), r.status_code)
+        return None
+    text = re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", r.text, flags=re.S | re.I)
+    text = html.unescape(re.sub(r"<[^>]+>", " ", text))
+    return re.sub(r"\s+", " ", text).strip()[:14000] or None
 
 
 def site_name(sender):
