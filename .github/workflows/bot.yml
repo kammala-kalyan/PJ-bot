@@ -59,6 +59,9 @@ jobs:
           EXCLUDE_ROLES: ${{ secrets.EXCLUDE_ROLES }}
           CAMPUS_CHANNEL_ID: ${{ secrets.CAMPUS_CHANNEL_ID }}
           OFFCAMPUS_CHANNEL_ID: ${{ secrets.OFFCAMPUS_CHANNEL_ID }}
+          FRIENDS_GROUP_ID: ${{ secrets.FRIENDS_GROUP_ID }}
+          FRIENDS_TOPIC_CAMPUS: ${{ secrets.FRIENDS_TOPIC_CAMPUS }}
+          FRIENDS_TOPIC_OFFCAMPUS: ${{ secrets.FRIENDS_TOPIC_OFFCAMPUS }}
           DB_PATH: data/state_v2.db
           LABELS_PATH: data/none.jsonl
           LOOP_MINUTES: "9"      # stay awake ~9 min per run ...

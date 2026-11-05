@@ -46,7 +46,8 @@ async def check_campus(s):
             log.info("%s: checked %s new message(s)", getattr(entity, "title", chat_id), len(msgs))
 
 
-def email_post(job, site, sender, subject, link, src):
+def email_post(job, site, sender, subject, link, src, private=True):
+    """private=False leaves out your inbox address and Gmail link (for the friends group)."""
     title = f"<b>{esc(job.get('title') or 'Job opening')}</b>"
     if job.get("company"):
         title += f" · {esc(job['company'])}"
@@ -59,7 +60,8 @@ def email_post(job, site, sender, subject, link, src):
     if job.get("reason"):
         lines.append(f"✅ <i>{esc(job['reason'])}</i>")
     lines.append(f"\n<b>Source:</b> {esc(site)} job alert")
-    lines.append(mailjobs.source_line(src, sender, subject))
+    if private:
+        lines.append(mailjobs.source_line(src, sender, subject))
     return "\n".join(lines)
 
 
@@ -104,7 +106,9 @@ async def check_inbox(s, address, password, box_id):
             if m.upper().startswith("L") and m[1:].isdigit() and 0 < int(m[1:]) <= len(links):
                 link = links[int(m[1:]) - 1]
             post = email_post(job, site, sender, subject, link, date)
-            await s.post_to("offcampus", lambda t, p=post: s.bot.send_text(t, p))
+            public = email_post(job, site, sender, subject, link, date, private=False)
+            await s.post_to("offcampus", lambda t, p=post: s.bot.send_text(t, p),
+                            shared=lambda t, p=public: s.bot.send_text(t, p))
             posted += 1
             log.info("📧 ✅ %s · %s (%s)", job.get("title"), job.get("company"), site)
         s.state.mark(box_id, uid, True)

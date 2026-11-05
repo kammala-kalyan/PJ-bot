@@ -63,6 +63,10 @@ TOPICS = {"campus": "🎯 Campus Jobs For Me", "offcampus": "🌐 Off-Campus Job
           "updates": "📬 Application Updates"}
 # Separate channels instead of topic tabs (CAMPUS_CHANNEL_ID / OFFCAMPUS_CHANNEL_ID in .env)
 CHANNELS = {k: int(os.environ[f"{k.upper()}_CHANNEL_ID"]) for k in TOPICS if os.getenv(f"{k.upper()}_CHANNEL_ID")}
+# Optional shared group for friends: gets campus + off-campus jobs only (never Application Updates)
+FRIENDS_GROUP_ID = int(os.getenv("FRIENDS_GROUP_ID") or 0)
+FRIENDS = {k: ("topic", FRIENDS_GROUP_ID, int(os.environ[f"FRIENDS_TOPIC_{k.upper()}"]))
+           for k in ("campus", "offcampus") if FRIENDS_GROUP_ID and os.getenv(f"FRIENDS_TOPIC_{k.upper()}")}
 IST = timezone(timedelta(hours=5, minutes=30))
 esc = html.escape
 
@@ -155,8 +159,10 @@ class Bot:
 
     @staticmethod
     def where(dest):
-        """dest = a topic id in the target group, or ("channel", chat_id) for a separate channel."""
+        """dest = a topic id in the target group, ("channel", chat_id), or ("topic", chat_id, topic_id)."""
         if isinstance(dest, tuple):
+            if dest[0] == "topic":
+                return {"chat_id": dest[1], "message_thread_id": dest[2]}
             return {"chat_id": dest[1]}
         return {"chat_id": TARGET_GROUP_ID, "message_thread_id": dest}
 
@@ -237,7 +243,17 @@ class Sorter:
         log.info("Created tab %s", TOPICS[key])
         return res["message_thread_id"]
 
-    async def post_to(self, key, send):
+    async def post_to(self, key, send, shared=None):
+        """Posts into your tab. Campus/off-campus jobs are also posted to the friends group;
+        `shared` sends a version without private details (defaults to the same post)."""
+        await self._post_own(key, send)
+        if key in FRIENDS:
+            try:
+                await (shared or send)(FRIENDS[key])
+            except Exception as e:
+                log.warning("Could not post to the friends group: %s", e)
+
+    async def _post_own(self, key, send):
         try:
             await send(await self.thread_for(key))
         except BotError as e:
