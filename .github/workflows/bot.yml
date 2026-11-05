@@ -52,6 +52,7 @@ jobs:
           GMAIL_ADDRESS2: ${{ secrets.GMAIL_ADDRESS2 }}
           GMAIL_APP_PASSWORD2: ${{ secrets.GMAIL_APP_PASSWORD2 }}
           TOPIC_CAMPUS: ${{ secrets.TOPIC_CAMPUS }}
+          TOPIC_OFFCAMPUS: ${{ secrets.TOPIC_OFFCAMPUS }}
           EXCLUDE_ROLES: ${{ secrets.EXCLUDE_ROLES }}
           CAMPUS_CHANNEL_ID: ${{ secrets.CAMPUS_CHANNEL_ID }}
           OFFCAMPUS_CHANNEL_ID: ${{ secrets.OFFCAMPUS_CHANNEL_ID }}
