@@ -1,0 +1,70 @@
+name: Placement bot
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # every 5 minutes (GitHub may run it a few minutes late)
+  workflow_dispatch:        # "Run workflow" button for a manual check
+
+concurrency:
+  group: placement-bot
+  cancel-in-progress: false
+
+permissions:
+  contents: write           # only for the monthly keep-alive commit
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      # The bot's memory (which messages/emails/jobs were already handled) lives in data/state_v2.db
+      - name: Restore bot memory
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: bot-state-${{ github.run_id }}
+          restore-keys: bot-state-
+
+      - name: Check placement groups and job-alert emails
+        env:
+          API_ID: ${{ secrets.API_ID }}
+          API_HASH: ${{ secrets.API_HASH }}
+          SESSION_STRING: ${{ secrets.SESSION_STRING }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          TARGET_GROUP_ID: ${{ secrets.TARGET_GROUP_ID }}
+          SOURCE_CHATS: ${{ secrets.SOURCE_CHATS }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
+          PROFILE: ${{ secrets.PROFILE }}
+          SKILLS_PROFILE: ${{ secrets.SKILLS_PROFILE }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          DB_PATH: data/state_v2.db
+          LABELS_PATH: data/none.jsonl
+        run: python run_once.py
+
+      - name: Save bot memory
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data
+          key: bot-state-${{ github.run_id }}
+
+      # GitHub pauses scheduled workflows after 60 days without commits; this commits once every ~3 weeks.
+      - name: Keep schedule alive
+        run: |
+          if [ $(( $(date +%s) - $(git log -1 --format=%ct) )) -gt 1800000 ]; then
+            date -u > .keepalive
+            git config user.name "placement-bot"
+            git config user.email "placement-bot@users.noreply.github.com"
+            git add .keepalive && git commit -m "keep-alive" && git push
+          fi

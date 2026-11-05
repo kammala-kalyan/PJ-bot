@@ -1,0 +1,9 @@
+# Secrets and personal data - never upload (repo is public)
+.env
+resumes/
+data/
+context.txt
+*.session
+__pycache__/
+venv/
+.vscode/

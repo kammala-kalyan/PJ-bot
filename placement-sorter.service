@@ -1,0 +1,15 @@
+[Unit]
+Description=Placement Sorter Telegram bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/placement-sorter
+ExecStart=/home/ubuntu/placement-sorter/venv/bin/python -u main.py
+Restart=always
+RestartSec=20
+
+[Install]
+WantedBy=multi-user.target
