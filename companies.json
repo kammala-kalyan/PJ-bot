@@ -1,0 +1,772 @@
+[
+ {
+  "name": "Swiggy",
+  "ats": "smartrecruiters",
+  "slug": "swiggy",
+  "jobs": 194,
+  "india_jobs": 131
+ },
+ {
+  "name": "Okta",
+  "ats": "greenhouse",
+  "slug": "okta",
+  "jobs": 389,
+  "india_jobs": 104
+ },
+ {
+  "name": "Databricks",
+  "ats": "greenhouse",
+  "slug": "databricks",
+  "jobs": 927,
+  "india_jobs": 89
+ },
+ {
+  "name": "ServiceNow",
+  "ats": "smartrecruiters",
+  "slug": "servicenow",
+  "jobs": 746,
+  "india_jobs": 86
+ },
+ {
+  "name": "MongoDB",
+  "ats": "greenhouse",
+  "slug": "mongodb",
+  "jobs": 361,
+  "india_jobs": 79
+ },
+ {
+  "name": "Tekion",
+  "ats": "ashby",
+  "slug": "tekion",
+  "jobs": 90,
+  "india_jobs": 66
+ },
+ {
+  "name": "Intel",
+  "ats": "workday",
+  "slug": "intel.wd1.myworkdayjobs.com|intel|External",
+  "jobs": 60,
+  "india_jobs": 60
+ },
+ {
+  "name": "Mastercard",
+  "ats": "workday",
+  "slug": "mastercard.wd1.myworkdayjobs.com|mastercard|CorporateCareers",
+  "jobs": 60,
+  "india_jobs": 59
+ },
+ {
+  "name": "Meesho",
+  "ats": "lever",
+  "slug": "meesho",
+  "jobs": 55,
+  "india_jobs": 54
+ },
+ {
+  "name": "Thermo Fisher",
+  "ats": "workday",
+  "slug": "thermofisher.wd5.myworkdayjobs.com|thermofisher|ThermoFisherCareers",
+  "jobs": 60,
+  "india_jobs": 53
+ },
+ {
+  "name": "Stripe",
+  "ats": "greenhouse",
+  "slug": "stripe",
+  "jobs": 761,
+  "india_jobs": 52
+ },
+ {
+  "name": "Target",
+  "ats": "workday",
+  "slug": "target.wd5.myworkdayjobs.com|target|targetcareers",
+  "jobs": 60,
+  "india_jobs": 51
+ },
+ {
+  "name": "Cisco",
+  "ats": "workday",
+  "slug": "cisco.wd5.myworkdayjobs.com|cisco|Cisco_Careers",
+  "jobs": 60,
+  "india_jobs": 48
+ },
+ {
+  "name": "InMobi",
+  "ats": "greenhouse",
+  "slug": "inmobi",
+  "jobs": 82,
+  "india_jobs": 48
+ },
+ {
+  "name": "Sarvam AI",
+  "ats": "ashby",
+  "slug": "sarvam",
+  "jobs": 47,
+  "india_jobs": 47
+ },
+ {
+  "name": "Supabase",
+  "ats": "ashby",
+  "slug": "supabase",
+  "jobs": 70,
+  "india_jobs": 46
+ },
+ {
+  "name": "HighRadius",
+  "ats": "greenhouse",
+  "slug": "highradius",
+  "jobs": 68,
+  "india_jobs": 45
+ },
+ {
+  "name": "Morgan Stanley",
+  "ats": "workday",
+  "slug": "ms.wd5.myworkdayjobs.com|ms|External",
+  "jobs": 60,
+  "india_jobs": 45
+ },
+ {
+  "name": "Wells Fargo",
+  "ats": "workday",
+  "slug": "wf.wd1.myworkdayjobs.com|wf|WellsFargoJobs",
+  "jobs": 60,
+  "india_jobs": 44
+ },
+ {
+  "name": "HP",
+  "ats": "workday",
+  "slug": "hp.wd5.myworkdayjobs.com|hp|ExternalCareerSite",
+  "jobs": 60,
+  "india_jobs": 44
+ },
+ {
+  "name": "Hevo Data",
+  "ats": "lever",
+  "slug": "hevodata",
+  "jobs": 42,
+  "india_jobs": 41
+ },
+ {
+  "name": "BlackRock",
+  "ats": "workday",
+  "slug": "blackrock.wd1.myworkdayjobs.com|blackrock|BlackRock_Professional",
+  "jobs": 43,
+  "india_jobs": 39
+ },
+ {
+  "name": "Gitlab",
+  "ats": "greenhouse",
+  "slug": "gitlab",
+  "jobs": 243,
+  "india_jobs": 38
+ },
+ {
+  "name": "Sigmoid",
+  "ats": "greenhouse",
+  "slug": "sigmoid",
+  "jobs": 43,
+  "india_jobs": 38
+ },
+ {
+  "name": "Rubrik",
+  "ats": "greenhouse",
+  "slug": "rubrik",
+  "jobs": 152,
+  "india_jobs": 34
+ },
+ {
+  "name": "Freshworks",
+  "ats": "smartrecruiters",
+  "slug": "freshworks",
+  "jobs": 122,
+  "india_jobs": 34
+ },
+ {
+  "name": "Zenoti",
+  "ats": "greenhouse",
+  "slug": "zenoti",
+  "jobs": 57,
+  "india_jobs": 34
+ },
+ {
+  "name": "CrowdStrike",
+  "ats": "workday",
+  "slug": "crowdstrike.wd5.myworkdayjobs.com|crowdstrike|crowdstrikecareers",
+  "jobs": 35,
+  "india_jobs": 31
+ },
+ {
+  "name": "Nasdaq",
+  "ats": "workday",
+  "slug": "nasdaq.wd1.myworkdayjobs.com|nasdaq|Global_External_Site",
+  "jobs": 33,
+  "india_jobs": 30
+ },
+ {
+  "name": "Applied Materials",
+  "ats": "workday",
+  "slug": "amat.wd1.myworkdayjobs.com|amat|External",
+  "jobs": 60,
+  "india_jobs": 28
+ },
+ {
+  "name": "Adobe",
+  "ats": "workday",
+  "slug": "adobe.wd5.myworkdayjobs.com|adobe|external_experienced",
+  "jobs": 44,
+  "india_jobs": 28
+ },
+ {
+  "name": "Arista Networks",
+  "ats": "smartrecruiters",
+  "slug": "aristanetworks",
+  "jobs": 234,
+  "india_jobs": 25
+ },
+ {
+  "name": "Zeta",
+  "ats": "lever",
+  "slug": "zeta",
+  "jobs": 29,
+  "india_jobs": 24
+ },
+ {
+  "name": "Philips",
+  "ats": "workday",
+  "slug": "philips.wd3.myworkdayjobs.com|philips|jobs-and-careers",
+  "jobs": 60,
+  "india_jobs": 23
+ },
+ {
+  "name": "State Street",
+  "ats": "workday",
+  "slug": "statestreet.wd1.myworkdayjobs.com|statestreet|Global",
+  "jobs": 60,
+  "india_jobs": 23
+ },
+ {
+  "name": "Glance",
+  "ats": "greenhouse",
+  "slug": "glance",
+  "jobs": 35,
+  "india_jobs": 22
+ },
+ {
+  "name": "Workday",
+  "ats": "workday",
+  "slug": "workday.wd5.myworkdayjobs.com|workday|Workday",
+  "jobs": 26,
+  "india_jobs": 21
+ },
+ {
+  "name": "Mindtickle",
+  "ats": "lever",
+  "slug": "mindtickle",
+  "jobs": 21,
+  "india_jobs": 19
+ },
+ {
+  "name": "Salesforce",
+  "ats": "workday",
+  "slug": "salesforce.wd12.myworkdayjobs.com|salesforce|External_Career_Site",
+  "jobs": 60,
+  "india_jobs": 18
+ },
+ {
+  "name": "Fampay",
+  "ats": "lever",
+  "slug": "fampay",
+  "jobs": 17,
+  "india_jobs": 17
+ },
+ {
+  "name": "Elastic",
+  "ats": "greenhouse",
+  "slug": "elastic",
+  "jobs": 421,
+  "india_jobs": 16
+ },
+ {
+  "name": "GE HealthCare",
+  "ats": "workday",
+  "slug": "gehc.wd5.myworkdayjobs.com|gehc|GEHC_ExternalSite",
+  "jobs": 22,
+  "india_jobs": 14
+ },
+ {
+  "name": "Airbnb",
+  "ats": "greenhouse",
+  "slug": "airbnb",
+  "jobs": 208,
+  "india_jobs": 13
+ },
+ {
+  "name": "Druva",
+  "ats": "greenhouse",
+  "slug": "druva",
+  "jobs": 29,
+  "india_jobs": 13
+ },
+ {
+  "name": "Commvault",
+  "ats": "greenhouse",
+  "slug": "commvault",
+  "jobs": 56,
+  "india_jobs": 13
+ },
+ {
+  "name": "Coinbase",
+  "ats": "greenhouse",
+  "slug": "coinbase",
+  "jobs": 278,
+  "india_jobs": 12
+ },
+ {
+  "name": "CRED",
+  "ats": "lever",
+  "slug": "cred",
+  "jobs": 13,
+  "india_jobs": 12
+ },
+ {
+  "name": "Headout",
+  "ats": "greenhouse",
+  "slug": "headoutcareers",
+  "jobs": 20,
+  "india_jobs": 12
+ },
+ {
+  "name": "Snowflake",
+  "ats": "ashby",
+  "slug": "snowflake",
+  "jobs": 373,
+  "india_jobs": 11
+ },
+ {
+  "name": "Grab",
+  "ats": "smartrecruiters",
+  "slug": "grab",
+  "jobs": 449,
+  "india_jobs": 11
+ },
+ {
+  "name": "PayPal",
+  "ats": "workday",
+  "slug": "paypal.wd1.myworkdayjobs.com|paypal|jobs",
+  "jobs": 19,
+  "india_jobs": 11
+ },
+ {
+  "name": "Agoda",
+  "ats": "greenhouse",
+  "slug": "agoda",
+  "jobs": 312,
+  "india_jobs": 11
+ },
+ {
+  "name": "Kyndryl",
+  "ats": "workday",
+  "slug": "kyndryl.wd5.myworkdayjobs.com|kyndryl|KyndrylProfessionalCareers",
+  "jobs": 60,
+  "india_jobs": 10
+ },
+ {
+  "name": "Sahaj Software",
+  "ats": "greenhouse",
+  "slug": "sahajsoftware",
+  "jobs": 13,
+  "india_jobs": 10
+ },
+ {
+  "name": "Groww",
+  "ats": "greenhouse",
+  "slug": "groww",
+  "jobs": 9,
+  "india_jobs": 9
+ },
+ {
+  "name": "Datadog",
+  "ats": "greenhouse",
+  "slug": "datadog",
+  "jobs": 396,
+  "india_jobs": 8
+ },
+ {
+  "name": "Continental",
+  "ats": "smartrecruiters",
+  "slug": "continental",
+  "jobs": 562,
+  "india_jobs": 8
+ },
+ {
+  "name": "Turing",
+  "ats": "greenhouse",
+  "slug": "turing",
+  "jobs": 43,
+  "india_jobs": 8
+ },
+ {
+  "name": "OpenAI",
+  "ats": "ashby",
+  "slug": "openai",
+  "jobs": 811,
+  "india_jobs": 7
+ },
+ {
+  "name": "Twilio",
+  "ats": "greenhouse",
+  "slug": "twilio",
+  "jobs": 128,
+  "india_jobs": 7
+ },
+ {
+  "name": "Ixigo",
+  "ats": "smartrecruiters",
+  "slug": "ixigo",
+  "jobs": 7,
+  "india_jobs": 7
+ },
+ {
+  "name": "Anthropic",
+  "ats": "greenhouse",
+  "slug": "anthropic",
+  "jobs": 681,
+  "india_jobs": 6
+ },
+ {
+  "name": "AB InBev",
+  "ats": "greenhouse",
+  "slug": "abinbev",
+  "jobs": 57,
+  "india_jobs": 6
+ },
+ {
+  "name": "Observe.AI",
+  "ats": "greenhouse",
+  "slug": "observeai",
+  "jobs": 12,
+  "india_jobs": 6
+ },
+ {
+  "name": "Red Hat",
+  "ats": "workday",
+  "slug": "redhat.wd5.myworkdayjobs.com|redhat|jobs",
+  "jobs": 9,
+  "india_jobs": 6
+ },
+ {
+  "name": "New Relic",
+  "ats": "greenhouse",
+  "slug": "newrelic",
+  "jobs": 48,
+  "india_jobs": 6
+ },
+ {
+  "name": "Figma",
+  "ats": "greenhouse",
+  "slug": "figma",
+  "jobs": 144,
+  "india_jobs": 5
+ },
+ {
+  "name": "Atlan",
+  "ats": "ashby",
+  "slug": "atlan",
+  "jobs": 6,
+  "india_jobs": 4
+ },
+ {
+  "name": "Quest Global",
+  "ats": "smartrecruiters",
+  "slug": "questglobaltechnologies",
+  "jobs": 3,
+  "india_jobs": 3
+ },
+ {
+  "name": "Thoughtworks",
+  "ats": "greenhouse",
+  "slug": "thoughtworks",
+  "jobs": 50,
+  "india_jobs": 3
+ },
+ {
+  "name": "Unacademy",
+  "ats": "smartrecruiters",
+  "slug": "unacademy",
+  "jobs": 3,
+  "india_jobs": 3
+ },
+ {
+  "name": "Notion",
+  "ats": "ashby",
+  "slug": "notion",
+  "jobs": 148,
+  "india_jobs": 2
+ },
+ {
+  "name": "Pocket FM",
+  "ats": "lever",
+  "slug": "pocketfm",
+  "jobs": 14,
+  "india_jobs": 2
+ },
+ {
+  "name": "Vercel",
+  "ats": "greenhouse",
+  "slug": "vercel",
+  "jobs": 88,
+  "india_jobs": 1
+ },
+ {
+  "name": "Asana",
+  "ats": "greenhouse",
+  "slug": "asana",
+  "jobs": 110,
+  "india_jobs": 1
+ },
+ {
+  "name": "Polygon Labs",
+  "ats": "ashby",
+  "slug": "polygon-labs",
+  "jobs": 5,
+  "india_jobs": 1
+ },
+ {
+  "name": "Duolingo",
+  "ats": "greenhouse",
+  "slug": "duolingo",
+  "jobs": 55,
+  "india_jobs": 1
+ },
+ {
+  "name": "NVIDIA",
+  "ats": "workday",
+  "slug": "nvidia.wd5.myworkdayjobs.com|nvidia|NVIDIAExternalCareerSite",
+  "jobs": 60,
+  "india_jobs": 1
+ },
+ {
+  "name": "Cloudflare",
+  "ats": "greenhouse",
+  "slug": "cloudflare",
+  "jobs": 464,
+  "india_jobs": 1
+ },
+ {
+  "name": "Autodesk",
+  "ats": "workday",
+  "slug": "autodesk.wd1.myworkdayjobs.com|autodesk|Ext",
+  "jobs": 1,
+  "india_jobs": 1
+ },
+ {
+  "name": "Cars24",
+  "ats": "smartrecruiters",
+  "slug": "cars24",
+  "jobs": 1,
+  "india_jobs": 1
+ },
+ {
+  "name": "Genpact",
+  "ats": "smartrecruiters",
+  "slug": "genpactindia",
+  "jobs": 1,
+  "india_jobs": 1
+ },
+ {
+  "name": "Lendingkart",
+  "ats": "smartrecruiters",
+  "slug": "lendingkart",
+  "jobs": 1,
+  "india_jobs": 1
+ },
+ {
+  "name": "Loop Health",
+  "ats": "smartrecruiters",
+  "slug": "loophealth",
+  "jobs": 1,
+  "india_jobs": 1
+ },
+ {
+  "name": "NoBroker",
+  "ats": "smartrecruiters",
+  "slug": "nobroker",
+  "jobs": 1,
+  "india_jobs": 1
+ },
+ {
+  "name": "Scale AI",
+  "ats": "greenhouse",
+  "slug": "scaleai",
+  "jobs": 165,
+  "india_jobs": 1
+ },
+ {
+  "name": "Cohere",
+  "ats": "ashby",
+  "slug": "cohere",
+  "jobs": 118,
+  "india_jobs": 0
+ },
+ {
+  "name": "Perplexity",
+  "ats": "ashby",
+  "slug": "perplexity",
+  "jobs": 139,
+  "india_jobs": 0
+ },
+ {
+  "name": "Sentry",
+  "ats": "ashby",
+  "slug": "sentry",
+  "jobs": 39,
+  "india_jobs": 0
+ },
+ {
+  "name": "Dropbox",
+  "ats": "greenhouse",
+  "slug": "dropbox",
+  "jobs": 31,
+  "india_jobs": 0
+ },
+ {
+  "name": "Amber",
+  "ats": "ashby",
+  "slug": "amber",
+  "jobs": 24,
+  "india_jobs": 0
+ },
+ {
+  "name": "LangChain",
+  "ats": "ashby",
+  "slug": "langchain",
+  "jobs": 101,
+  "india_jobs": 0
+ },
+ {
+  "name": "Bounce",
+  "ats": "ashby",
+  "slug": "bounce",
+  "jobs": 8,
+  "india_jobs": 0
+ },
+ {
+  "name": "PagerDuty",
+  "ats": "greenhouse",
+  "slug": "pagerduty",
+  "jobs": 48,
+  "india_jobs": 0
+ },
+ {
+  "name": "Ditto",
+  "ats": "ashby",
+  "slug": "ditto",
+  "jobs": 7,
+  "india_jobs": 0
+ },
+ {
+  "name": "Slice",
+  "ats": "greenhouse",
+  "slug": "slice",
+  "jobs": 23,
+  "india_jobs": 0
+ },
+ {
+  "name": "Stable Money",
+  "ats": "ashby",
+  "slug": "stable",
+  "jobs": 8,
+  "india_jobs": 0
+ },
+ {
+  "name": "Airtable",
+  "ats": "greenhouse",
+  "slug": "airtable",
+  "jobs": 5,
+  "india_jobs": 0
+ },
+ {
+  "name": "Replit",
+  "ats": "ashby",
+  "slug": "replit",
+  "jobs": 28,
+  "india_jobs": 0
+ },
+ {
+  "name": "Pinecone",
+  "ats": "ashby",
+  "slug": "pinecone",
+  "jobs": 5,
+  "india_jobs": 0
+ },
+ {
+  "name": "Canva",
+  "ats": "smartrecruiters",
+  "slug": "canva",
+  "jobs": 30,
+  "india_jobs": 0
+ },
+ {
+  "name": "Tala",
+  "ats": "lever",
+  "slug": "tala",
+  "jobs": 11,
+  "india_jobs": 0
+ },
+ {
+  "name": "Turtlemint",
+  "ats": "smartrecruiters",
+  "slug": "turtlemint",
+  "jobs": 1,
+  "india_jobs": 0
+ },
+ {
+  "name": "Upstox",
+  "ats": "smartrecruiters",
+  "slug": "upstox",
+  "jobs": 1,
+  "india_jobs": 0
+ },
+ {
+  "name": "Whatfix",
+  "ats": "smartrecruiters",
+  "slug": "whatfix",
+  "jobs": 1,
+  "india_jobs": 0
+ },
+ {
+  "name": "Miro",
+  "ats": "ashby",
+  "slug": "miro",
+  "jobs": 22,
+  "india_jobs": 0
+ },
+ {
+  "name": "Navi",
+  "ats": "ashby",
+  "slug": "navi",
+  "jobs": 2,
+  "india_jobs": 0
+ },
+ {
+  "name": "Rebel Foods",
+  "ats": "smartrecruiters",
+  "slug": "rebelfoods",
+  "jobs": 1,
+  "india_jobs": 0
+ },
+ {
+  "name": "Unbxd",
+  "ats": "smartrecruiters",
+  "slug": "unbxdinc",
+  "jobs": 1,
+  "india_jobs": 0
+ },
+ {
+  "name": "Vogo",
+  "ats": "lever",
+  "slug": "vogo",
+  "jobs": 3,
+  "india_jobs": 0
+ }
+]

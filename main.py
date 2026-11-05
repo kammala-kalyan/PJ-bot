@@ -78,6 +78,14 @@ class State:
         self.db.execute("CREATE TABLE IF NOT EXISTS processed(chat_id INTEGER, msg_id INTEGER, posted INTEGER,"
                         " PRIMARY KEY(chat_id, msg_id))")
         self.db.execute("CREATE TABLE IF NOT EXISTS posted_text(hash TEXT PRIMARY KEY)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS seen_jobs(key TEXT PRIMARY KEY)")  # career-page openings
+        self.db.commit()
+
+    def job_seen(self, key):
+        return self.db.execute("SELECT 1 FROM seen_jobs WHERE key=?", (key,)).fetchone() is not None
+
+    def mark_jobs(self, keys):
+        self.db.executemany("INSERT OR IGNORE INTO seen_jobs VALUES(?)", [(k,) for k in keys])
         self.db.commit()
 
     def topic(self, key):

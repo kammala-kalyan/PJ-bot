@@ -10,10 +10,12 @@ Run locally with:  python run_once.py
 """
 import asyncio
 import html
+import json
 import logging
 import os
 import time
 
+import careers
 import mailjobs
 from main import IST, Sorter, log
 
@@ -103,6 +105,58 @@ async def check_inbox(s, address, password, box_id):
         log.info("Checked %s alert email(s), posted %s matching job(s)", len(alerts), posted)
 
 
+COMPANIES = json.load(open("companies.json", encoding="utf-8")) if os.path.exists("companies.json") else []
+MAX_AI_PER_ROUND = int(os.getenv("CAREERS_MAX_AI", "12"))  # keeps the free AI quota safe on busy days
+
+
+async def check_careers(s):
+    """New openings on company career pages -> resume check -> 🌐 tab."""
+    if not COMPANIES:
+        return
+    results = await careers.fetch_all(COMPANIES)
+    new = []
+    for company, jobs in results:
+        if jobs is None:
+            continue
+        prefix = f"{company['ats']}:{company['slug']}:"
+        keys = [prefix + j["id"] for j in jobs]
+        if not s.state.job_seen(prefix + "*"):  # first time: remember today's openings, alert only on new ones
+            s.state.mark_jobs(keys + [prefix + "*"])
+            continue
+        fresh = [(k, j) for k, j in zip(keys, jobs) if not s.state.job_seen(k)]
+        s.state.mark_jobs([k for k, _ in fresh])
+        new += [(company, j) for _, j in fresh if careers.candidate(j)]
+    posted = 0
+    for company, job in new[:MAX_AI_PER_ROUND]:
+        if s.state.seen_key(mailjobs.job_key({"company": company["name"], "title": job["title"]})):
+            continue  # same role already posted (e.g. listed for several cities)
+        text = await careers.job_text(company, job)
+        info = await s.classifier.check_opening(
+            f"Company: {company['name']}\nJob title: {job['title']}\nLocation: {job['location']}\n\n{text}")
+        if not info.get("relevant"):
+            continue
+        info.update(company=company["name"], role=job["title"], location=job["location"], apply_link=job["url"])
+        post = career_post(info)
+        await s.post_to("offcampus", lambda t, p=post: s.bot.send_text(t, p))
+        posted += 1
+        log.info("🏢 ✅ %s · %s", job["title"], company["name"])
+    if new:
+        log.info("Career pages: %s new fresher-level opening(s), posted %s matching", len(new), posted)
+
+
+def career_post(info):
+    lines = [f"<b>{esc(info['role'])}</b> · {esc(info['company'])}"]
+    meta = [f"{icon} {esc(info[k])}" for icon, k in (("📍", "location"), ("💰", "pay"), ("⏳", "deadline"))
+            if info.get(k)]
+    if meta:
+        lines.append("   ".join(meta))
+    lines.append(f'🔗 <a href="{esc(info["apply_link"], quote=True)}">Apply on company site</a>')
+    if info.get("reason"):
+        lines.append(f"✅ <i>{esc(info['reason'])}</i>")
+    lines.append("\n<i>🏢 New on the company's careers page - apply early</i>")
+    return "\n".join(lines)
+
+
 async def main():
     # GitHub can only start a run every 5+ minutes, so each run stays awake for LOOP_MINUTES
     # and checks every CHECK_EVERY seconds; the next scheduled run takes over when it ends.
@@ -112,10 +166,14 @@ async def main():
     s = Sorter()
     await s.setup()
     try:
-        if mailjobs.ACCOUNTS:
+        if mailjobs.ACCOUNTS or COMPANIES:
             await s.thread_for("offcampus")
         while True:
             await check_campus(s)
+            try:
+                await check_careers(s)
+            except Exception:
+                log.exception("Career-page check failed; will retry next round")
             if mailjobs.ACCOUNTS:
                 try:
                     await check_email(s)

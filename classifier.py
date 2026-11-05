@@ -156,6 +156,16 @@ class Classifier:
             info["apply_link"] = best_link(clean)
         return info
 
+    async def check_opening(self, text):
+        """For text that is known to be a single job opening (career pages): resume check only."""
+        self.resumes.refresh()
+        if self.api_key:
+            try:
+                return await self._ai(text)
+            except Exception as e:
+                log.warning("AI check failed, using keyword match: %s", e)
+        return keyword_match(text, self.resumes.skills)
+
     def fill(self, template, text, limit=6000):
         basics = self.profile or "(not given)"
         if EXCLUDE_ROLES:
