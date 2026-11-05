@@ -105,6 +105,56 @@ async def check_inbox(s, address, password, box_id):
         log.info("Checked %s alert email(s), posted %s matching job(s)", len(alerts), posted)
 
 
+STATUS_ICON = {"applied": "📝", "assessment": "🧪", "interview": "🗓", "shortlisted": "⭐", "next round": "➡️",
+               "offer": "🎉", "rejected": "❌", "documents": "📄", "recruiter": "👋", "other": "📬"}
+
+
+async def check_updates(s):
+    """Follow-up emails about jobs you applied to -> 📬 Application Updates tab."""
+    for address, password, box_id in mailjobs.UPDATE_ACCOUNTS:
+        try:
+            mails = await asyncio.to_thread(mailjobs.fetch_updates, address, password,
+                                            lambda uid, b=box_id: s.state.done(b, uid))
+        except Exception:
+            log.exception("Update check failed for one inbox; will retry next round")
+            continue
+        for uid, sender, subject, date, text, links in mails:
+            if text is None:
+                s.state.mark(box_id, uid, False)
+                continue
+            prompt = (mailjobs.UPDATE_PROMPT.replace("__SENDER__", sender).replace("__SUBJECT__", subject)
+                      .replace("__TEXT__", text[:8000]))
+            try:
+                d = await s.classifier.ask_json(prompt)
+            except Exception as e:
+                log.warning("AI unavailable for update '%s' (%s); will retry", subject[:50], e)
+                break
+            if isinstance(d, list):
+                d = d[0] if d else {}
+            if d.get("is_update"):
+                link = None
+                m = str(d.get("link") or "")
+                if m.upper().startswith("L") and m[1:].isdigit() and 0 < int(m[1:]) <= len(links):
+                    link = links[int(m[1:]) - 1]
+                status = (d.get("status") or "other").lower()
+                head = f"{STATUS_ICON.get(status, '📬')} <b>{esc(status.title())}</b>"
+                who = " · ".join(esc(x) for x in (d.get("role"), d.get("company")) if x)
+                lines = [head + (f" - {who}" if who else "")]
+                if d.get("summary"):
+                    lines.append(esc(d["summary"]))
+                if d.get("action"):
+                    lines.append(f"👉 <b>To do:</b> {esc(d['action'])}")
+                if d.get("deadline"):
+                    lines.append(f"⏳ <b>By:</b> {esc(d['deadline'])}")
+                if link:
+                    lines.append(f'🔗 <a href="{esc(link, quote=True)}">Open</a>')
+                lines.append(f"\n<i>📧 {esc(sender[:60])} · {esc(subject[:80])}</i>")
+                post = "\n".join(lines)
+                await s.post_to("updates", lambda t, p=post: s.bot.send_text(t, p))
+                log.info("📬 %s · %s · %s", status, d.get("company"), d.get("role"))
+            s.state.mark(box_id, uid, bool(d.get("is_update")))
+
+
 COMPANIES = json.load(open("companies.json", encoding="utf-8")) if os.path.exists("companies.json") else []
 MAX_AI_PER_ROUND = int(os.getenv("CAREERS_MAX_AI", "12"))  # keeps the free AI quota safe on busy days
 
@@ -174,6 +224,8 @@ async def main():
                 await check_careers(s)
             except Exception:
                 log.exception("Career-page check failed; will retry next round")
+            if mailjobs.UPDATE_ACCOUNTS:
+                await check_updates(s)
             if mailjobs.ACCOUNTS:
                 try:
                     await check_email(s)

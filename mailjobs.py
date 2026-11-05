@@ -151,6 +151,77 @@ def fetch_alerts(address, password, is_done):
             pass
 
 
+# ---------- follow-ups on jobs you applied to ----------
+# Optional extra inbox you apply with (e.g. your main Gmail); the alert inboxes are checked too.
+GMAIL_ADDRESS3 = os.getenv("GMAIL_ADDRESS3", "")
+GMAIL_APP_PASSWORD3 = os.getenv("GMAIL_APP_PASSWORD3", "").replace(" ", "")
+UPDATE_ACCOUNTS = [(a, pw, -10 - i) for i, (a, pw) in enumerate(
+    [(a, pw) for a, pw, _ in ACCOUNTS] + [(GMAIL_ADDRESS3, GMAIL_APP_PASSWORD3)]) if a and pw]
+UPDATE_SENDERS = ["greenhouse.io", "greenhouse-mail.io", "lever.co", "myworkday.com", "workday.com",
+                  "smartrecruiters.com", "ashbyhq.com", "icims.com", "successfactors", "taleo.net", "oraclecloud.com",
+                  "hackerrank.com", "hackerearth.com", "mettl.com", "mercer", "codility.com", "imocha", "superset",
+                  "joinsuperset.com", "hirepro", "amcat", "aspiringminds", "unstop.com", "naukri.com", "instahyre.com",
+                  "wellfound.com", "cutshort.io", "zohorecruit", "keka.com", "darwinbox", "freshteam", "recruitee",
+                  "workable.com", "jobvite", "eightfold.ai", "phenom", "calendly.com"]
+UPDATE_SUBJECTS = ["application", "applied", "interview", "assessment", "shortlisted", "shortlist", "offer",
+                   "next steps", "next round", "candidature", "candidate", "online test", "coding test",
+                   "coding challenge", "hiring process", "selection process", "regret", "unfortunately",
+                   "congratulations", "onboarding", "documents", "background verification", "joining", "schedule"]
+NOT_UPDATE = re.compile(r"job alert|jobs for you|recommended jobs|new jobs|jobs matching|similar jobs|"
+                        r"newsletter|webinar|course|% off|sale|digest", re.I)
+
+UPDATE_PROMPT = """This email was received by a student who applies to jobs and internships.
+Decide whether it is an update about one of THE STUDENT'S OWN job/internship applications or hiring processes:
+application received/confirmation, online assessment or coding test invite, interview invite/schedule/reschedule,
+shortlist, next round, rejection, offer, onboarding/document/background-check request, recruiter reaching out about
+a specific role, or a reminder about any of these.
+NOT an update: job alerts, job recommendations, newsletters, marketing, course ads, generic "apply now" mails.
+
+Return only JSON:
+{"is_update": bool, "company": str|null, "role": str|null,
+ "status": "applied"|"assessment"|"interview"|"shortlisted"|"next round"|"offer"|"rejected"|"documents"|"recruiter"|"other",
+ "action": "what the student must do, short, or null", "deadline": "date/time if any, or null",
+ "link": "L<number> of the most important link (test/interview/portal), or null",
+ "summary": "one or two short lines"}
+
+EMAIL from __SENDER__, subject: __SUBJECT__
+<<<
+__TEXT__
+>>>"""
+
+
+def fetch_updates(address, password, is_done):
+    """-> list of (uid, sender, subject, date, text, links) for possible application follow-ups."""
+    imap = imaplib.IMAP4_SSL("imap.gmail.com")
+    imap.login(address, password)
+    try:
+        imap.select('"[Gmail]/All Mail"', readonly=True)
+        subj = " OR ".join(f'"{s}"' if " " in s else s for s in UPDATE_SUBJECTS)
+        query = (f"newer_than:{MAIL_DAYS}d -in:sent -in:spam (from:(" + " OR ".join(UPDATE_SENDERS)
+                 + f") OR subject:({subj}))")
+        typ, data = imap.uid("search", None, "X-GM-RAW", '"' + query.replace('"', '\\"') + '"')
+        out = []
+        for uid in [int(u) for u in (data[0] or b"").split()]:
+            if is_done(uid):
+                continue
+            typ, msg_data = imap.uid("fetch", str(uid), "(BODY.PEEK[])")
+            if not msg_data or not msg_data[0]:
+                continue
+            msg = email.message_from_bytes(msg_data[0][1])
+            subject, sender = _header(msg, "Subject"), _header(msg, "From")
+            if NOT_UPDATE.search(subject):
+                out.append((uid, sender, subject, msg.get("Date", ""), None, None))  # alert/marketing: mark done
+                continue
+            text, links = email_text(msg)
+            out.append((uid, sender, subject, msg.get("Date", ""), text, links))
+        return out
+    finally:
+        try:
+            imap.logout()
+        except Exception:
+            pass
+
+
 def site_name(sender):
     s = sender.lower()
     for name in ("LinkedIn", "Naukri", "Indeed", "Internshala", "Foundit", "Glassdoor", "Instahyre", "Cutshort",

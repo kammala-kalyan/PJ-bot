@@ -59,7 +59,8 @@ MAX_MEDIA_MB = int(os.getenv("MAX_MEDIA_MB", "20"))
 DB_PATH = os.getenv("DB_PATH", "data/state_v2.db")
 LABELS_PATH = os.getenv("LABELS_PATH", "data/labels.jsonl")  # pre-checked history labels (optional)
 ATTACH_WINDOW = timedelta(minutes=15)  # a file/photo with no text belongs to the message just before it
-TOPICS = {"campus": "🎯 Campus Jobs For Me", "offcampus": "🌐 Off-Campus Jobs For Me"}
+TOPICS = {"campus": "🎯 Campus Jobs For Me", "offcampus": "🌐 Off-Campus Jobs For Me",
+          "updates": "📬 Application Updates"}
 # Separate channels instead of topic tabs (CAMPUS_CHANNEL_ID / OFFCAMPUS_CHANNEL_ID in .env)
 CHANNELS = {k: int(os.environ[f"{k.upper()}_CHANNEL_ID"]) for k in TOPICS if os.getenv(f"{k.upper()}_CHANNEL_ID")}
 IST = timezone(timedelta(hours=5, minutes=30))
