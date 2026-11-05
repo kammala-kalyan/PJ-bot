@@ -48,6 +48,8 @@ jobs:
           SKILLS_PROFILE: ${{ secrets.SKILLS_PROFILE }}
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_ADDRESS2: ${{ secrets.GMAIL_ADDRESS2 }}
+          GMAIL_APP_PASSWORD2: ${{ secrets.GMAIL_APP_PASSWORD2 }}
           TOPIC_CAMPUS: ${{ secrets.TOPIC_CAMPUS }}
           DB_PATH: data/state_v2.db
           LABELS_PATH: data/none.jsonl

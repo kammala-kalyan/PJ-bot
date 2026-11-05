@@ -19,8 +19,13 @@ log = logging.getLogger("mail")
 
 GMAIL_ADDRESS = os.getenv("GMAIL_ADDRESS", "")
 GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "").replace(" ", "")
+# Optional second inbox (e.g. the one LinkedIn sends to)
+GMAIL_ADDRESS2 = os.getenv("GMAIL_ADDRESS2", "")
+GMAIL_APP_PASSWORD2 = os.getenv("GMAIL_APP_PASSWORD2", "").replace(" ", "")
+# (address, password, pseudo chat id under which its emails are remembered as processed)
+ACCOUNTS = [(a, pw, -1 - i) for i, (a, pw) in enumerate([(GMAIL_ADDRESS, GMAIL_APP_PASSWORD),
+                                                         (GMAIL_ADDRESS2, GMAIL_APP_PASSWORD2)]) if a and pw]
 MAIL_DAYS = int(os.getenv("MAIL_DAYS", "2"))  # how far back to look for unread-by-bot alerts
-MAIL_CHAT_ID = -1  # emails are stored in the same "processed" table under this pseudo chat id
 
 SENDERS = ["linkedin.com", "naukri.com", "indeed.com", "internshala.com", "foundit.in", "glassdoor",
            "instahyre.com", "cutshort.io", "wellfound.com", "unstop.com", "shine.com", "apna.co",
@@ -115,12 +120,10 @@ def _header(msg, name):
         return msg.get(name, "")
 
 
-def fetch_alerts(is_done):
+def fetch_alerts(address, password, is_done):
     """-> list of (uid, sender, subject, date, text, links) for job-alert emails not processed yet."""
-    if not (GMAIL_ADDRESS and GMAIL_APP_PASSWORD):
-        return []
     imap = imaplib.IMAP4_SSL("imap.gmail.com")
-    imap.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
+    imap.login(address, password)
     try:
         imap.select('"[Gmail]/All Mail"', readonly=True)  # also finds alerts filed under Promotions/Updates
         query = "from:(" + " OR ".join(SENDERS) + f") newer_than:{MAIL_DAYS}d"

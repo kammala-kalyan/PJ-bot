@@ -61,13 +61,20 @@ def email_post(job, site, subject, link):
 
 
 async def check_email(s):
-    if not (mailjobs.GMAIL_ADDRESS and mailjobs.GMAIL_APP_PASSWORD):
-        return
-    alerts = await asyncio.to_thread(mailjobs.fetch_alerts, lambda uid: s.state.done(mailjobs.MAIL_CHAT_ID, uid))
+    for address, password, box_id in mailjobs.ACCOUNTS:
+        try:
+            await check_inbox(s, address, password, box_id)
+        except Exception:
+            log.exception("Email check failed for one inbox; will retry next round")
+
+
+async def check_inbox(s, address, password, box_id):
+    alerts = await asyncio.to_thread(mailjobs.fetch_alerts, address, password,
+                                     lambda uid: s.state.done(box_id, uid))
     posted = 0
     for uid, sender, subject, date, text, links in alerts:
         if text is None or len(text) < 80:  # not a job alert
-            s.state.mark(mailjobs.MAIL_CHAT_ID, uid, False)
+            s.state.mark(box_id, uid, False)
             continue
         prompt = s.classifier.fill(mailjobs.EMAIL_PROMPT, text, limit=15000)
         prompt = prompt.replace("__SENDER__", sender).replace("__SUBJECT__", subject)
@@ -91,7 +98,7 @@ async def check_email(s):
             await s.post_to("offcampus", lambda t, p=post: s.bot.send_text(t, p))
             posted += 1
             log.info("📧 ✅ %s · %s (%s)", job.get("title"), job.get("company"), site)
-        s.state.mark(mailjobs.MAIL_CHAT_ID, uid, True)
+        s.state.mark(box_id, uid, True)
     if alerts:
         log.info("Checked %s alert email(s), posted %s matching job(s)", len(alerts), posted)
 
@@ -105,11 +112,11 @@ async def main():
     s = Sorter()
     await s.setup()
     try:
-        if mailjobs.GMAIL_ADDRESS:
+        if mailjobs.ACCOUNTS:
             await s.thread_for("offcampus")
         while True:
             await check_campus(s)
-            if mailjobs.GMAIL_ADDRESS:
+            if mailjobs.ACCOUNTS:
                 try:
                     await check_email(s)
                 except Exception:
