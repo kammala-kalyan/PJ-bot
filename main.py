@@ -73,7 +73,7 @@ class State:
 
     def __init__(self, path):
         os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-        self.db = sqlite3.connect(path)
+        self.db = sqlite3.connect(path, check_same_thread=False)  # email reader checks it from a worker thread
         self.db.execute("CREATE TABLE IF NOT EXISTS topics(key TEXT PRIMARY KEY, thread_id INTEGER)")
         self.db.execute("CREATE TABLE IF NOT EXISTS processed(chat_id INTEGER, msg_id INTEGER, posted INTEGER,"
                         " PRIMARY KEY(chat_id, msg_id))")
