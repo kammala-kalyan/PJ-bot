@@ -11,6 +11,8 @@ Run locally with:  python run_once.py
 import asyncio
 import html
 import logging
+import os
+import time
 
 import mailjobs
 from main import IST, Sorter, log
@@ -95,13 +97,26 @@ async def check_email(s):
 
 
 async def main():
+    # GitHub can only start a run every 5+ minutes, so each run stays awake for LOOP_MINUTES
+    # and checks every CHECK_EVERY seconds; the next scheduled run takes over when it ends.
+    loop_minutes = float(os.getenv("LOOP_MINUTES", "0"))  # 0 = single check (local use)
+    check_every = int(os.getenv("CHECK_EVERY", "120"))
+    end = time.monotonic() + loop_minutes * 60
     s = Sorter()
     await s.setup()
     try:
-        await check_campus(s)
         if mailjobs.GMAIL_ADDRESS:
             await s.thread_for("offcampus")
-            await check_email(s)
+        while True:
+            await check_campus(s)
+            if mailjobs.GMAIL_ADDRESS:
+                try:
+                    await check_email(s)
+                except Exception:
+                    log.exception("Email check failed; will retry next round")
+            if time.monotonic() + check_every > end:
+                break
+            await asyncio.sleep(check_every)
     finally:
         await s.client.disconnect()
         await s.bot.http.aclose()

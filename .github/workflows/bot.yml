@@ -2,7 +2,7 @@ name: Placement bot
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # every 5 minutes (GitHub may run it a few minutes late)
+    - cron: "*/5 * * * *"   # GitHub minimum; each run checks every 2 min for ~9 min
   workflow_dispatch:        # "Run workflow" button for a manual check
 
 concurrency:
@@ -15,7 +15,7 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -50,6 +50,8 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           DB_PATH: data/state_v2.db
           LABELS_PATH: data/none.jsonl
+          LOOP_MINUTES: "9"      # stay awake ~9 min per run ...
+          CHECK_EVERY: "120"     # ... checking every 2 minutes
         run: python run_once.py
 
       - name: Save bot memory
